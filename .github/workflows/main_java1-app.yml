@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy JAR app to Azure Web App - java1-app
 
 on:
@@ -8,7 +11,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    permissions:
+      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
@@ -20,36 +25,39 @@ jobs:
           distribution: 'microsoft'
 
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: target/*.jar   # FIXED
+          path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: java-app
-
-      - name: List workspace files (debug)
-        run: ls -R .
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9E5F81DACB394A6F9BEEE3811391EA14 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D5995DA258A84D609D3B4D57B0534BD0 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_176410AC0D554512B098BED3F34D5BE8 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A2483B2B91C44C5684A708F29EF6117F }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CE9E6338AB5D4E4984B5872F8D838040 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0565F164043042119A86EF122A9AB101 }}
 
       - name: Deploy to Azure Web App
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'java1-app'
-          package: 'java-app/*.jar'
+          slot-name: 'Production'
+          package: '*.jar'
+          

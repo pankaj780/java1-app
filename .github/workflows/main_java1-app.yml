@@ -32,32 +32,33 @@ jobs:
         with:
           name: java-app
           path: '${{ github.workspace }}/target/*.jar'
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-  
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: java-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9E5F81DACB394A6F9BEEE3811391EA14 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D5995DA258A84D609D3B4D57B0534BD0 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_176410AC0D554512B098BED3F34D5BE8 }}
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'java1-app'
-          slot-name: 'Production'
-          package: '*.jar'
           
+  deploy:
+      runs-on: ubuntu-latest
+      needs: build
+      permissions:
+        id-token: write
+        contents: read
+      
+      steps:
+        - name: Download artifact from build job
+          uses: actions/download-artifact@v4
+          with:
+            name: java-app
+        
+        - name: Login to Azure
+          uses: azure/login@v2
+          with: 
+           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9E5F81DACB394A6F9BEEE3811391EA14 }} 
+           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D5995DA258A84D609D3B4D57B0534BD0 }} 
+           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_176410AC0D554512B098BED3F34D5BE8 }}
+    
+        - name: Deploy to Azure Web App
+          id: deploy-to-webapp
+          uses: azure/webapps-deploy@v3
+          with:
+            app-name: 'java1-app'
+            slot-name: 'Production'
+            package: 'java-app/*.jar'
+    
+              

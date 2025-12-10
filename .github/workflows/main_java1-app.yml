@@ -60,7 +60,8 @@ jobs:
           with:
             app-name: 'java1-app'
             slot-name: 'Production'
-            package: 'java-app/*.jar'
+            package: '*.jar'
     
               
+
 

@@ -24,7 +24,7 @@ jobs:
           java-version: '21'
           distribution: 'microsoft'
 
-      - name: Build with Maven
+      - name: Build with Maven --DsSkip
         run: mvn clean install
 
       - name: Upload artifact for deployment job
@@ -60,4 +60,5 @@ jobs:
           app-name: 'java1-app'
           slot-name: 'Production'
           package: '*.jar'
+
           

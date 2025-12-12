@@ -1,27 +1,27 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: userservice_mysql
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: userservice_mssql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: userservice_db
-      MYSQL_USER: userservice_user
-      MYSQL_PASSWORD: userservice_pass
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "StrongPass@123"   # must meet SQL Server password rules!
+      MSSQL_PID: "Developer"
     ports:
-      - "3306:3306"
+      - "1433:1433"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mssql_data:/var/opt/mssql
     networks:
       - userservice_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "StrongPass@123", "-Q", "SELECT 1"]
+      interval: 10s
       retries: 10
+      timeout: 5s
 
 volumes:
-  mysql_data:
+  mssql_data:
 
 networks:
   userservice_network:
